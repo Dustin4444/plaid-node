@@ -7,10 +7,12 @@ The official Node.js client library for the [Plaid API][1].
 - [Installation](#install)
   - [Versioning](#versioning)
 - [Getting started](#getting-started)
+- [Dates](#dates)
 - [Error Handling](#error-handling)
 - [Examples](#examples)
 - [Promise Support](#promise-support)
 - [Migration Guide](#migration-guide)
+- [Webhook troubleshooting with Next.js](#webhook-troubleshooting-with-nextjs)
 - [Support](#support)
 - [Contributing](#contributing)
 - [License](#license)
@@ -106,7 +108,7 @@ plaidClient
   });
 ```
 
-Note that the full error object includes the API configuration object, including the request headers, which in turn include the API key and secret. To avoid logging your API secret, log only `error.data` and/or avoid logging the full `error.config.headers` object.
+Note that the full error object includes the API configuration object, including the request headers, which in turn include the API key and secret. To avoid logging your API secret, log only `error.response.data` and/or avoid logging the full `error.config.headers` object.
 
 ## Examples
 
@@ -129,15 +131,15 @@ const response = await plaidClient.transactionsSync({
   access_token
 });
 const transactions = response.data.transactions;
-);
 ```
 
 Retrieve the transactions for a transactions user for the last thirty days (using the older method):
 
 ```typescript
-const now = moment();
-const today = now.format('YYYY-MM-DD');
-const thirtyDaysAgo = now.subtract(30, 'days').format('YYYY-MM-DD');
+const today = new Date().toISOString().slice(0, 10);
+const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  .toISOString()
+  .slice(0, 10);
 
 const response = await plaidClient.transactionsGet({
   access_token,
